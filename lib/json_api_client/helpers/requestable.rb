@@ -19,6 +19,10 @@ module JsonApiClient
         def requestor
           @requestor ||= requestor_class.new(self)
         end
+
+        def additional_headers
+          {}
+        end
       end
 
       def save
