@@ -70,7 +70,7 @@ module JsonApiClient
       def load(params)
         new(params).tap do |resource|
           resource.mark_as_persisted!
-          resource.clear_changes_information
+          resource.clear_changes!
         end
       end
 
@@ -354,6 +354,7 @@ module JsonApiClient
         mark_as_persisted!
         if updated = last_result_set.first
           self.attributes = updated.attributes
+          changes_applied
         end
         true
       end

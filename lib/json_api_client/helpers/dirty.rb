@@ -1,22 +1,27 @@
 module JsonApiClient
   module Helpers
     module Dirty
+      extend ActiveSupport::Concern
 
-      def changed?
-        changed_attributes.present?
+      included do
+        include ActiveModel::Dirty
       end
 
-      def changed
-        changed_attributes.keys
-      end
+      # def changed?
+      #   changed_attributes.present?
+      # end
+      #
+      # def changed
+      #   changed_attributes.keys
+      # end
 
-      def changed_attributes
-        @changed_attributes ||= ActiveSupport::HashWithIndifferentAccess.new
-      end
-
-      def clear_changes_information
-        @changed_attributes = ActiveSupport::HashWithIndifferentAccess.new
-      end
+      # def previous_changes
+      #   @previously_changed ||= ActiveSupport::HashWithIndifferentAccess.new
+      # end
+      #
+      # def changed_attributes
+      #   @changed_attributes ||= ActiveSupport::HashWithIndifferentAccess.new
+      # end
 
       def set_all_attributes_dirty
         attributes.each do |k, v|
@@ -24,30 +29,34 @@ module JsonApiClient
         end
       end
 
-      def attribute_will_change!(attr)
-        return if attribute_changed?(attr)
-        set_attribute_was(attr, attributes[attr])
+      def clear_changes!
+        clear_changes_information
       end
 
-      def set_attribute_was(attr, value)
-        begin
-          value = value.duplicable? ? value.clone : value
-          changed_attributes[attr] = value
-        rescue TypeError, NoMethodError
-        end
-      end
-
-      def attribute_was(attr) # :nodoc:
-        attribute_changed?(attr) ? changed_attributes[attr] : attributes[attr]
-      end
-
-      def attribute_changed?(attr)
-        changed.include?(attr.to_s)
-      end
-
-      def attribute_change(attr)
-        [changed_attributes[attr], attributes[attr]] if attribute_changed?(attr)
-      end
+      # def attribute_will_change!(attr)
+      #   return if attribute_changed?(attr)
+      #   set_attribute_was(attr, attributes[attr])
+      # end
+      #
+      # def set_attribute_was(attr, value)
+      #   begin
+      #     value = value.duplicable? ? value.clone : value
+      #     changed_attributes[attr] = value
+      #   rescue TypeError, NoMethodError
+      #   end
+      # end
+      #
+      # def attribute_was(attr) # :nodoc:
+      #   attribute_changed?(attr) ? changed_attributes[attr] : attributes[attr]
+      # end
+      #
+      # def attribute_changed?(attr)
+      #   changed.include?(attr.to_s)
+      # end
+      #
+      # def attribute_change(attr)
+      #   [changed_attributes[attr], attributes[attr]] if attribute_changed?(attr)
+      # end
 
       protected
 
@@ -65,6 +74,17 @@ module JsonApiClient
         attribute_will_change!(name) if value != attributes[name]
         super
       end
+
+      # private
+      #
+      # def clear_changes_information
+      #   @changed_attributes = ActiveSupport::HashWithIndifferentAccess.new
+      # end
+      #
+      # def changes_applied
+      #   @previously_changed = changes
+      #   @changed_attributes = ActiveSupport::HashWithIndifferentAccess.new
+      # end
 
     end
   end
